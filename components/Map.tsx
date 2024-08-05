@@ -24,36 +24,29 @@ export default function Map() {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
-    const formData = new FormData();
-    formData.append("video", file);
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        setUploadedVideo(data.videoUrl);
-        setProtestLocations((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            latitude: data.location.latitude,
-            longitude: data.location.longitude,
-            title: "New Protest",
-          },
-        ]);
-      } else {
-        console.error("Video upload failed");
-      }
-    } catch (error) {
-      console.error("Error uploading video:", error);
-    }
+    const cloudinaryUrl = await uploadToCloudinary(file);
+    console.log(cloudinaryUrl);
   };
 
+  const uploadToCloudinary = async (file: File) => {
+    const url = `https://api.cloudinary.com/v1_1/ddhg7gunr/image/upload`
+    const formData = new FormData()
+
+    formData.append("file", file)
+    formData.append("upload_preset", "ml_default")
+
+    const res = await fetch(url, {
+      method: "POST",
+      body: formData
+    })
+
+    if (!res.ok) {
+      throw new Error("Failed to upload file to Cloudinary")
+    }
+
+    const data = await res.json()
+    return data.secure_url
+  }
   return (
     <div className="h-screen px-8">
       <h1>Protest Map</h1>
