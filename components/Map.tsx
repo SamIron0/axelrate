@@ -143,7 +143,12 @@ export default function Map({
           </button>
         )}
       </div>
-      <MapContainer bounds={bounds} style={{ height: "80%", width: "100%" }}>
+      <MapContainer
+        center={[9.0820, 8.6753]}
+        
+        zoom={6}
+        style={{ height: "80%", width: "100%" }}
+      >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {userLocation && <ChangeView center={userLocation} />}
         {protestLocations.map((protest) => (
