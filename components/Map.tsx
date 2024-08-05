@@ -42,7 +42,14 @@ export default function Map() {
   return (
     <div className="h-screen px-8">
       <h1>Protest Map</h1>
-      <input type="file" accept="video/*" onChange={handleVideoUpload} />
+      <div className="flex justify-center my-10 items-center">
+        <form >
+          <input type="file" name="video" accept="video/*" />
+          <button className="bg-blue-800 text-white p-2 rounded-md">
+            Upload
+          </button>
+        </form>
+      </div>{" "}
       <MapContainer bounds={bounds} style={{ height: "80%", width: "100%" }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {[...initialProtests, ...protestLocations].map((protest) => (
