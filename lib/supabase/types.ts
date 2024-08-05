@@ -36,9 +36,8 @@ export type Database = {
           id: string;
           video_url: string;
           title: string;
-          created_at: string;
+          created_at?: string ;
           user_id: string;
-          geolocation: string;
           latitude: string;
           longitude: string;
           status: string;
@@ -49,7 +48,6 @@ export type Database = {
           title: string | null;
           created_at: string | null;
           user_id: string | null;
-          geolocation: string | null;
           latitude: string | null;
           longitude: string | null;
           status: string | null;
@@ -62,7 +60,6 @@ export type Database = {
           title: string | null;
           created_at: string | null;
           user_id: string | null;
-          geolocation: string | null;
           status: string | null;
         };
       };

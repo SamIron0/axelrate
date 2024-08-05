@@ -6,7 +6,7 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-export async function upload(previousState: string | undefined | null, formData: FormData) {
+export async function upload( formData: FormData) {
   //console.log("uploading")
   const file = formData.get('video') as File;
   const buffer: Buffer = Buffer.from(await file.arrayBuffer());
@@ -14,13 +14,11 @@ export async function upload(previousState: string | undefined | null, formData:
     const base64Image: string = `data:${file.type};base64,${buffer.toString(
       'base64'
     )}`;
-    //console.log(`The file: ${previousState} is uploading...`);
     const response = await cloudinary.uploader.upload(base64Image, {
       resource_type: 'video',
       public_id: 'my_video',
     });
-    previousState = response.secure_url;
-    return previousState
+    return response.secure_url;
   } catch (error: any) {
     console.error(error);
   }

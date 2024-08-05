@@ -3,12 +3,14 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { upload } from "@/lib/cloudinary/cloudinary";
 import { Tables } from "@/lib/supabase/types";
-
+import L from "leaflet";
 export default function Map({
   protestLocations,
 }: {
   protestLocations: Tables<"protests">[];
 }) {
+  const [protests, setProtests] =
+    useState<Tables<"protests">[]>(protestLocations);
   const [isRecording, setIsRecording] = useState(false);
   const [recordedVideo, setRecordedVideo] = useState<Blob | null>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
@@ -16,7 +18,11 @@ export default function Map({
   );
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-
+  const icon = L.icon({
+    iconUrl: "/marker.png",
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+  });
   const bounds = [
     [4.3161, 3.3941], // Southwest corner (near Lagos)
     [13.1514, 14.7225], // Northeast corner (near Borno)
@@ -70,7 +76,7 @@ export default function Map({
     }
   };
 
-  const uploadRecordedVideo = async () => {
+  const uploadProtest = async () => {
     if (recordedVideo && userLocation) {
       const formData = new FormData();
       formData.append("video", recordedVideo, "recorded-video.webm");
@@ -78,8 +84,20 @@ export default function Map({
       formData.append("longitude", userLocation[1].toString());
 
       try {
-        const response = await upload(null, formData);
-        // Handle the response
+        //Upload the video to cloudinary and  get the url
+        const video_url = await upload(formData);
+        // use the video_url to create a protest
+
+        const result = await fetch("/api/protest ", {
+          method: "POST",
+          body: JSON.stringify({
+            video_url,
+            latitude: userLocation[0],
+            longitude: userLocation[1],
+          }),
+        });
+        const protest = await result.json();
+        setProtests([...protests, protest]);
       } catch (error) {
         console.error("Error uploading video:", error);
       }
@@ -99,7 +117,7 @@ export default function Map({
 
   return (
     <div className="h-screen px-8">
-      <div className="flex flex-col items-center my-10">
+      <div className="flex flex-col items-center ">
         <video ref={videoRef} autoPlay muted className="mb-4" />
         {!isRecording ? (
           <button
@@ -118,7 +136,7 @@ export default function Map({
         )}
         {recordedVideo && (
           <button
-            onClick={uploadRecordedVideo}
+            onClick={uploadProtest}
             className="bg-green-800 text-white p-2 rounded-md"
           >
             Upload
@@ -132,15 +150,11 @@ export default function Map({
           <Marker
             key={protest.id}
             position={[protest.latitude, protest.longitude]}
+            icon={icon}
           >
             <Popup>{protest.title}</Popup>
           </Marker>
         ))}
-        {userLocation && (
-          <Marker position={userLocation}>
-            <Popup>Your current location</Popup>
-          </Marker>
-        )}
       </MapContainer>
     </div>
   );
