@@ -5,9 +5,6 @@ import { uploadVideo } from "@/lib/cloudinary/cloudinary";
 
 export async function POST(request: NextRequest) {
   const video = request.body;
- 
- 
-
   if (!video) {
     return NextResponse.json(
       { success: false, message: "No video uploaded" },

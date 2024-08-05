@@ -21,37 +21,22 @@ export default function Map() {
     [13.1514, 14.7225], // Northeast corner (near Borno)
   ] as [[number, number], [number, number]];
 
-  const handleVideoUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const cloudinaryUrl = await postData({
-      url: "/api/upload",
-      data: file,
-    });
-    console.log(cloudinaryUrl);
+  
+    const formData = new FormData();
+    formData.append('video', file);
+  
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+    } catch (error) {
+      console.error('Error uploading video:', error);
+    }
   };
-
-//   const uploadToCloudinary = async (file: File) => {
-//     const url = `https://api.cloudinary.com/v1_1/ddhg7gunr/image/upload`
-//     const formData = new FormData()
-
-//     formData.append("file", file)
-//     formData.append("upload_preset", "ml_default")
-
-//     const res = await fetch(url, {
-//       method: "POST",
-//       body: formData
-//     })
-
-//     if (!res.ok) {
-//       throw new Error("Failed to upload file to Cloudinary")
-//     }
-
-//     const data = await res.json()
-//     return data.secure_url
-//   }
   return (
     <div className="h-screen px-8">
       <h1>Protest Map</h1>
