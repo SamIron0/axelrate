@@ -1,7 +1,7 @@
-import Map from "@/components/Map";
+import MapWrapper from "@/components/MapWrapper";
 
 export default function Page() {
   return (
-    <Map/>
+    <MapWrapper />
   );
 };
