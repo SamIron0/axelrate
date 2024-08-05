@@ -69,10 +69,8 @@ export default function Map() {
       formData.append("video", recordedVideo, "recorded-video.webm");
 
       try {
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
+        const response = await upload(null, formData);
+        
         // Handle the response
       } catch (error) {
         console.error("Error uploading video:", error);
@@ -106,7 +104,7 @@ export default function Map() {
             onClick={uploadRecordedVideo}
             className="bg-green-800 text-white p-2 rounded-md"
           >
-            Upload Recorded Video
+            Upload
           </button>
         )}
       </div>
