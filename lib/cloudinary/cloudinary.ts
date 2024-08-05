@@ -7,6 +7,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 export async function upload(previousState: string | undefined | null, formData: FormData) {
+  console.log("uploading")
   const file = formData.get('video') as File;
   const buffer: Buffer = Buffer.from(await file.arrayBuffer());
   try {
