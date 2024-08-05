@@ -3,6 +3,7 @@ import "leaflet/dist/leaflet.css";
 import { ProtestLocation } from "@/types";
 import { useState } from "react";
 import { uploadVideo } from "@/lib/cloudinary/cloudinary";
+import { postData } from "@/lib/utils";
 
 export default function Map() {
   const [uploadedVideo, setUploadedVideo] = useState<string | null>(null);
@@ -25,7 +26,10 @@ export default function Map() {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const cloudinaryUrl = await uploadVideo(file);
+    const cloudinaryUrl = await postData({
+      url: "/api/upload",
+      data: file,
+    });
     console.log(cloudinaryUrl);
   };
 

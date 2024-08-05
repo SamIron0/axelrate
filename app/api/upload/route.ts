@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import path from "path";
+import { uploadVideo } from "@/lib/cloudinary/cloudinary";
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -13,25 +14,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const buffer = await video.arrayBuffer();
-  const filename = `${Date.now()}-${video.name}`;
-  const filepath = path.join(process.cwd(), "public", "videos", filename);
+  const cloudinaryUrl = await uploadVideo(video);
 
-  try {
-    await writeFile(filepath, Buffer.from(buffer));
-    return NextResponse.json({
-      success: true,
-      videoUrl: `/videos/${filename}`,
-      location: {
-        latitude: 6.5244, // Example latitude (Lagos)
-        longitude: 3.3792, // Example longitude (Lagos)
-      },
-    });
-  } catch (error) {
-    console.error("Error saving video:", error);
-    return NextResponse.json(
-      { success: false, message: "Failed to save video" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({ success: true, url: cloudinaryUrl });
 }
