@@ -22,7 +22,7 @@ export default function Map() {
   ] as [[number, number], [number, number]];
 
   return (
-    <div className=" px-8">
+    <div className=" ">
      <MapContainer bounds={bounds} style={{ height: "80%", width: "100%" }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {[...initialProtests, ...protestLocations].map((protest) => (
