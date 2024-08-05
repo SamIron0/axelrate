@@ -45,11 +45,26 @@ export default function Map() {
   const [url, formAction] = useFormState(upload, null);
   return (
     <div className="h-screen px-8">
-      <h1>Protest Map</h1>
       <div className="flex justify-center my-10 items-center">
         <form action={formAction}>
-          <input type="file" name="video" accept="video/*" />
-          <button className="bg-blue-800 text-white p-2 rounded-md">
+          <input
+            type="file"
+            name="video"
+            accept="video/*"
+            capture="user"
+            className="hidden"
+            id="cameraInput"
+          />
+          <label
+            htmlFor="cameraInput"
+            className="bg-blue-800 text-white p-2 rounded-md cursor-pointer"
+          >
+            Record Video
+          </label>
+          <button
+            type="submit"
+            className="bg-green-600 text-white p-2 rounded-md ml-2"
+          >
             Upload
           </button>
         </form>
