@@ -1,10 +1,10 @@
+"use client";
 import { useFormState } from "react-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { ProtestLocation } from "@/types";
 import { useState } from "react";
 import { upload } from "@/lib/cloudinary/cloudinary";
-import { postData } from "@/lib/utils";
 
 export default function Map() {
   const [uploadedVideo, setUploadedVideo] = useState<string | null>(null);
