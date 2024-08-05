@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { ProtestLocation } from "@/types";
-import { useFormState } from "react-dom";
 import { upload } from "@/lib/cloudinary/cloudinary";
 
 export default function Map() {
@@ -92,7 +91,6 @@ export default function Map() {
     }
   };
 
-  const [url, formAction] = useFormState(upload, null);
 
   // Custom component to update map view when userLocation changes
   function ChangeView({ center }: { center: [number, number] | null }) {

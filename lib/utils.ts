@@ -1,10 +1,6 @@
-export const postData = async ({ url, data }: { url: string; data?: any }) => {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: new Headers({ "Content-Type": "application/json" }),
-    credentials: "same-origin",
-    body: JSON.stringify(data),
-  });
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-  return res.json();
-};
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
