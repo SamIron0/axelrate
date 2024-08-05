@@ -149,7 +149,10 @@ export default function Map({
         {protestLocations.map((protest) => (
           <Marker
             key={protest.id}
-            position={[protest.latitude, protest.longitude]}
+            position={[
+              parseFloat(protest.latitude),
+              parseFloat(protest.longitude),
+            ]}
             icon={icon}
           >
             <Popup>{protest.title}</Popup>
