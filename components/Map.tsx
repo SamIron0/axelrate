@@ -7,7 +7,6 @@ import { useState } from "react";
 import { upload } from "@/lib/cloudinary/cloudinary";
 
 export default function Map() {
-  const [uploadedVideo, setUploadedVideo] = useState<string | null>(null);
   const [protestLocations, setProtestLocations] = useState<ProtestLocation[]>(
     []
   );
@@ -22,24 +21,6 @@ export default function Map() {
     [13.1514, 14.7225], // Northeast corner (near Borno)
   ] as [[number, number], [number, number]];
 
-  const handleVideoUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("video", file);
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-    } catch (error) {
-      console.error("Error uploading video:", error);
-    }
-  };
   return (
     <div className=" px-8">
      <MapContainer bounds={bounds} style={{ height: "80%", width: "100%" }}>
