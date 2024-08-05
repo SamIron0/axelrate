@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { ProtestLocation } from "@/types";
 import { useState } from "react";
+import { uploadVideo } from "@/lib/cloudinary/cloudinary";
 
 export default function Map() {
   const [uploadedVideo, setUploadedVideo] = useState<string | null>(null);
@@ -24,29 +25,29 @@ export default function Map() {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const cloudinaryUrl = await uploadToCloudinary(file);
+    const cloudinaryUrl = await uploadVideo(file);
     console.log(cloudinaryUrl);
   };
 
-  const uploadToCloudinary = async (file: File) => {
-    const url = `https://api.cloudinary.com/v1_1/ddhg7gunr/image/upload`
-    const formData = new FormData()
+//   const uploadToCloudinary = async (file: File) => {
+//     const url = `https://api.cloudinary.com/v1_1/ddhg7gunr/image/upload`
+//     const formData = new FormData()
 
-    formData.append("file", file)
-    formData.append("upload_preset", "ml_default")
+//     formData.append("file", file)
+//     formData.append("upload_preset", "ml_default")
 
-    const res = await fetch(url, {
-      method: "POST",
-      body: formData
-    })
+//     const res = await fetch(url, {
+//       method: "POST",
+//       body: formData
+//     })
 
-    if (!res.ok) {
-      throw new Error("Failed to upload file to Cloudinary")
-    }
+//     if (!res.ok) {
+//       throw new Error("Failed to upload file to Cloudinary")
+//     }
 
-    const data = await res.json()
-    return data.secure_url
-  }
+//     const data = await res.json()
+//     return data.secure_url
+//   }
   return (
     <div className="h-screen px-8">
       <h1>Protest Map</h1>

@@ -9,8 +9,8 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-// Function to upload an image to Cloudinary
-export const uploadImage = async (file: any): Promise<string> => {
+// Function to upload a video to Cloudinary
+export const uploadVideo = async (file: any): Promise<string> => {
   return new Promise((resolve, reject) => {
     cloudinary.v2.uploader.upload(file.path, (error: any, result: any) => {
       if (error) {
