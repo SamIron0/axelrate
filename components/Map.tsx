@@ -4,6 +4,8 @@ import { ProtestLocation } from "@/types";
 import { useState } from "react";
 // import { uploadVideo } from "@/lib/cloudinary/cloudinary";
 // import { postData } from "@/lib/utils";
+import { useFormState } from "react-dom";
+import { upload } from "@/lib/cloudinary/cloudinary";
 
 export default function Map() {
   const [uploadedVideo, setUploadedVideo] = useState<string | null>(null);
@@ -39,11 +41,13 @@ export default function Map() {
       console.error("Error uploading video:", error);
     }
   };
+
+  const [url, formAction] = useFormState(upload, null);
   return (
     <div className="h-screen px-8">
       <h1>Protest Map</h1>
       <div className="flex justify-center my-10 items-center">
-        <form >
+        <form>
           <input type="file" name="video" accept="video/*" />
           <button className="bg-blue-800 text-white p-2 rounded-md">
             Upload
