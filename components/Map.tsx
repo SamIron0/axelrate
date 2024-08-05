@@ -47,7 +47,7 @@ export default function Map() {
     <div className="h-screen px-8">
       <h1>Protest Map</h1>
       <div className="flex justify-center my-10 items-center">
-        <form>
+        <form action={formAction}>
           <input type="file" name="video" accept="video/*" />
           <button className="bg-blue-800 text-white p-2 rounded-md">
             Upload
