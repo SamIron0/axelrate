@@ -41,20 +41,8 @@ export default function Map() {
     }
   };
   return (
-    <div className="h-screen px-8">
-      <h1>Protest Map</h1>
-      <div className="flex justify-center mt-10 items-center">
-        <form action={formAction}>
-          <input type="file" accept="video/*" />
-          <button
-            type="submit"
-            className="bg-zinc-800 text-white p-2 rounded-md"
-          >
-            Upload
-          </button>
-        </form>
-      </div>{" "}
-      <MapContainer bounds={bounds} style={{ height: "80%", width: "100%" }}>
+    <div className=" px-8">
+     <MapContainer bounds={bounds} style={{ height: "80%", width: "100%" }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {[...initialProtests, ...protestLocations].map((protest) => (
           <Marker
