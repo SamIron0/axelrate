@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { ProtestLocation } from "@/types";
 import { upload } from "@/lib/cloudinary/cloudinary";
+import { Tables } from "@/lib/supabase/types";
 
-export default function Map() {
-  const [protestLocations, setProtestLocations] = useState<ProtestLocation[]>(
-    []
-  );
+export default function Map({
+  protestLocations,
+}: {
+  protestLocations: Tables<"protests">[];
+}) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordedVideo, setRecordedVideo] = useState<Blob | null>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
@@ -15,12 +16,6 @@ export default function Map() {
   );
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-
-  // Initial protest data
-  const initialProtests: ProtestLocation[] = [
-    { id: 1, latitude: 6.5244, longitude: 3.3792, title: "Protest in Lagos" },
-    { id: 2, latitude: 9.0765, longitude: 7.3986, title: "Protest in Abuja" },
-  ];
 
   const bounds = [
     [4.3161, 3.3941], // Southwest corner (near Lagos)
@@ -91,7 +86,6 @@ export default function Map() {
     }
   };
 
-
   // Custom component to update map view when userLocation changes
   function ChangeView({ center }: { center: [number, number] | null }) {
     const map = useMap();
@@ -134,7 +128,7 @@ export default function Map() {
       <MapContainer bounds={bounds} style={{ height: "80%", width: "100%" }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {userLocation && <ChangeView center={userLocation} />}
-        {[...initialProtests, ...protestLocations].map((protest) => (
+        {protestLocations.map((protest) => (
           <Marker
             key={protest.id}
             position={[protest.latitude, protest.longitude]}

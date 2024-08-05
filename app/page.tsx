@@ -1,4 +1,6 @@
 import MapWrapper from "@/components/MapWrapper";
-export default function Home() {
-  return <MapWrapper />;
+import { getAllProtests } from "@/db/protests";
+export default async function Home() {
+  const protestLocations = await getAllProtests();
+  return <MapWrapper protestLocations={protestLocations} />;
 }

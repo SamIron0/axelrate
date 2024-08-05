@@ -35,22 +35,31 @@ export type Database = {
         Row: {
           id: string;
           video_url: string;
+          title: string;
           created_at: string;
           user_id: string;
           geolocation: string;
+          latitude: string;
+          longitude: string;
           status: string;
         };
         Insert: {
           id: string | null;
           video_url: string | null;
+          title: string | null;
           created_at: string | null;
           user_id: string | null;
           geolocation: string | null;
+          latitude: string | null;
+          longitude: string | null;
           status: string | null;
         };
         Update: {
           id: string;
           video_url: string | null;
+          latitude: string | null;
+          longitude: string | null;
+          title: string | null;
           created_at: string | null;
           user_id: string | null;
           geolocation: string | null;

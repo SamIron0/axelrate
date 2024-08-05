@@ -1,11 +1,15 @@
 "use client";
-import dynamic from 'next/dynamic';
-import { ProtestLocation } from "@/types";
+import { Tables } from "@/lib/supabase/types";
+import dynamic from "next/dynamic";
 
-const MapWithNoSSR = dynamic(() => import('./Map'), {
+const MapWithNoSSR = dynamic(() => import("./Map"), {
   ssr: false,
 });
 
-export default function MapWrapper() {
-  return <MapWithNoSSR />;
+export default function MapWrapper({
+  protestLocations,
+}: {
+  protestLocations: Tables<"protests">[] | null;
+}) {
+  return <MapWithNoSSR protestLocations={protestLocations || []} />;
 }
