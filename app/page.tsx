@@ -3,6 +3,7 @@ import { CldVideoPlayer } from "next-cloudinary";
 import "next-cloudinary/dist/cld-video-player.css";
 import { upload } from "@/lib/cloudinary/cloudinary";
 import { useFormState } from "react-dom";
+import MapWrapper from "@/components/MapWrapper";
 export default function Home() {
   const [url, formAction] = useFormState(upload, null);
   return (
@@ -19,6 +20,7 @@ export default function Home() {
         </form>
       </div>
       {url && <CldVideoPlayer width="860" height="470" src={url} />}
+      <MapWrapper />
     </div>
   );
 }
