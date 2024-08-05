@@ -1,25 +1,26 @@
-// lib/cloudinary.ts
 
-import cloudinary from "cloudinary"
-
-// Initialize Cloudinary with your credentials (usually from environment variables)
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-})
-
-// Function to upload a video to Cloudinary
-export const uploadVideo = async (file: any): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    cloudinary.v2.uploader.upload(file.path, (error: any, result: any) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve(result.secure_url)
-      }
-    })
-  })
+"use server"
+import { v2 as cloudinary } from 'cloudinary';
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+export async function upload(previousState: string | undefined | null, formData: FormData) {
+  const file = formData.get('video') as File;
+  const buffer: Buffer = Buffer.from(await file.arrayBuffer());
+  try {
+    const base64Image: string = `data:${file.type};base64,${buffer.toString(
+      'base64'
+    )}`;
+    console.log(`The file: ${previousState} is uploading...`);
+    const response = await cloudinary.uploader.upload(base64Image, {
+      resource_type: 'video',
+      public_id: 'my_video',
+    });
+    previousState = response.secure_url;
+    return previousState
+  } catch (error: any) {
+    console.error(error);
+  }
 }
-
-export default cloudinary
