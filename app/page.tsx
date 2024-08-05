@@ -10,7 +10,7 @@ interface ProtestLocation {
   title: string;
 }
 
-const App: React.FC = () => {
+export default function Page() {
   const [uploadedVideo, setUploadedVideo] = useState<string | null>(null);
   const [protestLocations, setProtestLocations] = useState<ProtestLocation[]>(
     []
@@ -81,5 +81,3 @@ const App: React.FC = () => {
     </div>
   );
 };
-
-export default App;
