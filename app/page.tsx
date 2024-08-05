@@ -1,7 +1,7 @@
-"use client";
-import { useState } from "react";
+import Map from "@/components/Map";
 
 export default function Page() {
-  const [x, setX] = useState(0);
-  return <></>;
-}
+  return (
+    <Map/>
+  );
+};

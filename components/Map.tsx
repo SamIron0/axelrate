@@ -59,17 +59,7 @@ export default function Map() {
     <div className="h-screen px-8">
       <h1>Protest Map</h1>
       <input type="file" accept="video/*" onChange={handleVideoUpload} />
-      <MapContainer bounds={bounds} style={{ height: "80%", width: "100%" }}>
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {[...initialProtests, ...protestLocations].map((protest) => (
-          <Marker
-            key={protest.id}
-            position={[protest.latitude, protest.longitude]}
-          >
-            <Popup>{protest.title}</Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+      
     </div>
   );
 }
