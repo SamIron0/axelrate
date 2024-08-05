@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import React, { useState, useRef, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { ProtestLocation } from "@/types";
 import { useFormState } from "react-dom";
@@ -11,6 +11,9 @@ export default function Map() {
   );
   const [isRecording, setIsRecording] = useState(false);
   const [recordedVideo, setRecordedVideo] = useState<Blob | null>(null);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(
+    null
+  );
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
@@ -27,6 +30,16 @@ export default function Map() {
 
   const startRecording = async () => {
     try {
+      // First, get the user's location
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        }
+      );
+
+      setUserLocation([position.coords.latitude, position.coords.longitude]);
+
+      // Then start recording
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
@@ -52,7 +65,7 @@ export default function Map() {
       mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
-      console.error("Error accessing camera:", error);
+      console.error("Error accessing camera or location:", error);
     }
   };
 
@@ -64,13 +77,14 @@ export default function Map() {
   };
 
   const uploadRecordedVideo = async () => {
-    if (recordedVideo) {
+    if (recordedVideo && userLocation) {
       const formData = new FormData();
       formData.append("video", recordedVideo, "recorded-video.webm");
+      formData.append("latitude", userLocation[0].toString());
+      formData.append("longitude", userLocation[1].toString());
 
       try {
         const response = await upload(null, formData);
-        
         // Handle the response
       } catch (error) {
         console.error("Error uploading video:", error);
@@ -79,6 +93,17 @@ export default function Map() {
   };
 
   const [url, formAction] = useFormState(upload, null);
+
+  // Custom component to update map view when userLocation changes
+  function ChangeView({ center }: { center: [number, number] | null }) {
+    const map = useMap();
+    useEffect(() => {
+      if (center) {
+        map.setView(center, 13);
+      }
+    }, [center, map]);
+    return null;
+  }
 
   return (
     <div className="h-screen px-8">
@@ -110,6 +135,7 @@ export default function Map() {
       </div>
       <MapContainer bounds={bounds} style={{ height: "80%", width: "100%" }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        {userLocation && <ChangeView center={userLocation} />}
         {[...initialProtests, ...protestLocations].map((protest) => (
           <Marker
             key={protest.id}
@@ -118,6 +144,11 @@ export default function Map() {
             <Popup>{protest.title}</Popup>
           </Marker>
         ))}
+        {userLocation && (
+          <Marker position={userLocation}>
+            <Popup>Your current location</Popup>
+          </Marker>
+        )}
       </MapContainer>
     </div>
   );
