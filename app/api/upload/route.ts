@@ -1,68 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
-import formidable, { File } from "formidable";
-import fs from "fs";
+import { writeFile } from "fs/promises";
 import path from "path";
 
-// Ensure upload directory exists
-const uploadDir = path.join(process.cwd(), "public/uploads");
+export async function POST(request: NextRequest) {
+  const formData = await request.formData();
+  const video = formData.get("video") as File;
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Disable Next.js body parsing
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-// Helper function to parse the form data
-const parseForm = async (req: NextRequest) => {
-  const form = new formidable.IncomingForm({
-    uploadDir,
-    keepExtensions: true,
-  });
-
-  return new Promise<{ fields: any; files: any }>((resolve, reject) => {
-    form.parse(req as any, (err, fields, files) => {
-      if (err) reject(err);
-      resolve({ fields, files });
-    });
-  });
-};
-
-export async function POST(req: NextRequest) {
-  try {
-    const { files } = await parseForm(req);
-
-    const videoFile = files.video as File;
-    if (!videoFile) {
-      return NextResponse.json(
-        { success: false, message: "No video file uploaded" },
-        { status: 400 }
-      );
-    }
-
-    const fileName = path.basename(videoFile.filepath);
-    const videoUrl = `/uploads/${fileName}`;
-
-    // Dummy location data
-    const responseData = {
-      success: true,
-      location: {
-        latitude: 6.5244,
-        longitude: 3.3792,
-      },
-      videoUrl,
-      message: "Video uploaded and verified",
-    };
-
-    return NextResponse.json(responseData, { status: 200 });
-  } catch (error) {
-    console.error("Error processing upload:", error);
+  if (!video) {
     return NextResponse.json(
-      { success: false, message: "Error processing upload" },
+      { success: false, message: "No video uploaded" },
+      { status: 400 }
+    );
+  }
+
+  const buffer = await video.arrayBuffer();
+  const filename = `${Date.now()}-${video.name}`;
+  const filepath = path.join(process.cwd(), "public", "videos", filename);
+
+  try {
+    await writeFile(filepath, Buffer.from(buffer));
+    return NextResponse.json({
+      success: true,
+      videoUrl: `/videos/${filename}`,
+      location: {
+        latitude: 6.5244, // Example latitude (Lagos)
+        longitude: 3.3792, // Example longitude (Lagos)
+      },
+    });
+  } catch (error) {
+    console.error("Error saving video:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to save video" },
       { status: 500 }
     );
   }
