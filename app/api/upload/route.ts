@@ -4,8 +4,9 @@ import path from "path";
 import { uploadVideo } from "@/lib/cloudinary/cloudinary";
 
 export async function POST(request: NextRequest) {
-  const formData = await request.formData();
-  const video = formData.get("video") as File;
+  const video = request.body;
+ 
+ 
 
   if (!video) {
     return NextResponse.json(
