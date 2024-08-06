@@ -44,23 +44,31 @@ export default function Map({
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setUserLocation([position.coords.latitude, position.coords.longitude]);
+        
         if (fileInputRef.current) {
+          if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            // For mobile devices
+            toast.info("Please use your camera to capture the protest video");
+          } else {
+            // For desktop
+            toast.info("Please select a video file from your device");
+          }
           fileInputRef.current.click();
         }
       },
       (error) => {
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            toast.error("User denied the request for Geolocation.");
+            toast.error("Location access denied. Please enable location services.");
             break;
           case error.POSITION_UNAVAILABLE:
             toast.error("Location information is unavailable.");
             break;
           case error.TIMEOUT:
-            toast.error("The request to get user location timed out.");
+            toast.error("Location request timed out. Please try again.");
             break;
           default:
-            toast.error("An unknown error occurred.");
+            toast.error("An unknown error occurred while getting location.");
             break;
         }
       },
