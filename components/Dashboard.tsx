@@ -12,8 +12,8 @@ export default function Dashboard({
  const [videoUrl, setVideoUrl] = useState<string | null>(null);
  
   return (
-    <div className="h-screen p-4 lg:px-8">
-      {videoUrl ? <VideoPlayer onSetVideo={setVideoUrl}/> : <Map protestLocations={protestLocations} onSetVideo={setVideoUrl}/>}
-      </div>
+    <>
+      {videoUrl ? <VideoPlayer videoUrl={videoUrl} onClose={() => setVideoUrl(null)}/> : <Map protestLocations={protestLocations} onSetVideo={setVideoUrl}/>}
+    </>
   );
 }

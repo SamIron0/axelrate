@@ -16,3 +16,8 @@ export const addProtest = async (protest: Tables<"protests">) => {
     .single();
   return data;
 };
+export const getPendingProtests = async () => {
+  const supabase = createClient(cookies());
+  const { data, error } = await supabase.from("protests").select("*").eq("status", "pending");
+  return data;
+};
