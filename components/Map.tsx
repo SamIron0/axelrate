@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { upload } from "@/lib/cloudinary/cloudinary";
 import { Tables } from "@/lib/supabase/types";
 import L from "leaflet";
+import { toast } from "sonner";
 
 export default function Map({
   protestLocations,
@@ -29,6 +30,17 @@ export default function Map({
   ];
 
   const handleCaptureClick = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    };
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setUserLocation([position.coords.latitude, position.coords.longitude]);
@@ -37,8 +49,22 @@ export default function Map({
         }
       },
       (error) => {
-        console.error("Error getting location:", error);
-      }
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error("User denied the request for Geolocation.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            toast.error("The request to get user location timed out.");
+            break;
+          default:
+            toast.error("An unknown error occurred.");
+            break;
+        }
+      },
+      options
     );
   };
 
@@ -67,8 +93,8 @@ export default function Map({
 
         const protest = await result.json();
         setProtests([...protests, protest]);
-      } catch (error) {
-        console.error("Error uploading video:", error);
+      } catch (error: any) {
+        toast.error(error.message);
       }
     }
   };
@@ -84,14 +110,14 @@ export default function Map({
   }
 
   return (
-    <div className="h-screen px-8">
+    <div className="h-screen px-4 lg:px-8">
+      <button
+        onClick={handleCaptureClick}
+        className="bg-blue-800 text-white p-2 rounded-md mb-2"
+      >
+        Capture Protest
+      </button>
       <div className="flex flex-col items-center">
-        <button
-          onClick={handleCaptureClick}
-          className="bg-blue-800 text-white p-2 rounded-md mb-2"
-        >
-          Capture Protest
-        </button>
         <input
           type="file"
           accept="video/*"
