@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { upload } from "@/lib/cloudinary/cloudinary";
@@ -10,12 +10,12 @@ export default function Map({
 }: {
   protestLocations: Tables<"protests">[];
 }) {
-  const [protests, setProtests] = useState<Tables<"protests">[]>(protestLocations);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordedVideo, setRecordedVideo] = useState<Blob | null>(null);
-  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const [protests, setProtests] =
+    useState<Tables<"protests">[]>(protestLocations);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(
+    null
+  );
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const icon = L.icon({
     iconUrl: "/marker.png",
@@ -28,67 +28,32 @@ export default function Map({
     [13.1514, 14.7225], // Northeast corner (near Borno)
   ];
 
-  const startRecording = async () => {
-    try {
-      // First, get the user's location
-      const position = await new Promise<GeolocationPosition>(
-        (resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject);
+  const handleCaptureClick = () => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation([position.coords.latitude, position.coords.longitude]);
+        if (fileInputRef.current) {
+          fileInputRef.current.click();
         }
-      );
-
-      setUserLocation([position.coords.latitude, position.coords.longitude]);
-
-      // Then start recording
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+      },
+      (error) => {
+        console.error("Error getting location:", error);
       }
-
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-
-      const chunks: BlobPart[] = [];
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "video/webm" });
-        setRecordedVideo(blob);
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error("Error accessing camera or location:", error);
-    }
+    );
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
-
-  const uploadProtest = async () => {
-    if (recordedVideo && userLocation) {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file && userLocation) {
       const formData = new FormData();
-      formData.append("video", recordedVideo, "recorded-video.webm");
+      formData.append("video", file);
       formData.append("latitude", userLocation[0].toString());
       formData.append("longitude", userLocation[1].toString());
 
       try {
-        // Upload the video to cloudinary and get the url
         const video_url = await upload(formData);
-        // use the video_url to create a protest
 
         const result = await fetch("/api/protest", {
           method: "POST",
@@ -108,10 +73,9 @@ export default function Map({
     }
   };
 
-  // Custom component to update map view when userLocation changes
   function ChangeView({ center }: { center: [number, number] | null }) {
     const map = useMap();
-    useEffect(() => {
+    React.useEffect(() => {
       if (center) {
         map.setView(center, 13);
       }
@@ -122,33 +86,23 @@ export default function Map({
   return (
     <div className="h-screen px-8">
       <div className="flex flex-col items-center">
-        <video ref={videoRef} autoPlay muted className="mb-4" />
-        {!isRecording ? (
-          <button
-            onClick={startRecording}
-            className="bg-blue-800 text-white p-2 rounded-md mb-2"
-          >
-            Start Recording
-          </button>
-        ) : (
-          <button
-            onClick={stopRecording}
-            className="bg-red-800 text-white p-2 rounded-md mb-2"
-          >
-            Stop Recording
-          </button>
-        )}
-        {recordedVideo && (
-          <button
-            onClick={uploadProtest}
-            className="bg-green-800 text-white p-2 rounded-md"
-          >
-            Upload
-          </button>
-        )}
+        <button
+          onClick={handleCaptureClick}
+          className="bg-blue-800 text-white p-2 rounded-md mb-2"
+        >
+          Capture Protest
+        </button>
+        <input
+          type="file"
+          accept="video/*"
+          capture="environment"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="hidden"
+        />
       </div>
       <MapContainer
-        center={[9.0820, 8.6753]}
+        center={[9.082, 8.6753]}
         zoom={6}
         style={{ height: "80%", width: "100%" }}
       >
