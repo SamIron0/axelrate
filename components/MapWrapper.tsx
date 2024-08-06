@@ -2,7 +2,7 @@
 import { Tables } from "@/lib/supabase/types";
 import dynamic from "next/dynamic";
 
-const MapWithNoSSR = dynamic(() => import("./Map"), {
+const MapWithNoSSR = dynamic(() => import("./Dashboard"), {
   ssr: false,
 });
 
