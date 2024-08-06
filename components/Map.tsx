@@ -4,29 +4,29 @@ import "leaflet/dist/leaflet.css";
 import { upload } from "@/lib/cloudinary/cloudinary";
 import { Tables } from "@/lib/supabase/types";
 import L from "leaflet";
+
 export default function Map({
   protestLocations,
 }: {
   protestLocations: Tables<"protests">[];
 }) {
-  const [protests, setProtests] =
-    useState<Tables<"protests">[]>(protestLocations);
+  const [protests, setProtests] = useState<Tables<"protests">[]>(protestLocations);
   const [isRecording, setIsRecording] = useState(false);
   const [recordedVideo, setRecordedVideo] = useState<Blob | null>(null);
-  const [userLocation, setUserLocation] = useState<[number, number] | null>(
-    null
-  );
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+
   const icon = L.icon({
     iconUrl: "/marker.png",
     iconSize: [30, 30],
     iconAnchor: [15, 15],
   });
-  const bounds = [
+
+  const bounds: [[number, number], [number, number]] = [
     [4.3161, 3.3941], // Southwest corner (near Lagos)
     [13.1514, 14.7225], // Northeast corner (near Borno)
-  ] as [[number, number], [number, number]];
+  ];
 
   const startRecording = async () => {
     try {
@@ -44,9 +44,11 @@ export default function Map({
         video: true,
         audio: true,
       });
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
+
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
 
@@ -84,18 +86,20 @@ export default function Map({
       formData.append("longitude", userLocation[1].toString());
 
       try {
-        //Upload the video to cloudinary and  get the url
+        // Upload the video to cloudinary and get the url
         const video_url = await upload(formData);
         // use the video_url to create a protest
 
-        const result = await fetch("/api/protest ", {
+        const result = await fetch("/api/protest", {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             video_url,
             latitude: userLocation[0],
             longitude: userLocation[1],
           }),
         });
+
         const protest = await result.json();
         setProtests([...protests, protest]);
       } catch (error) {
@@ -117,7 +121,7 @@ export default function Map({
 
   return (
     <div className="h-screen px-8">
-      <div className="flex flex-col items-center ">
+      <div className="flex flex-col items-center">
         <video ref={videoRef} autoPlay muted className="mb-4" />
         {!isRecording ? (
           <button
@@ -145,13 +149,12 @@ export default function Map({
       </div>
       <MapContainer
         center={[9.0820, 8.6753]}
-        
         zoom={6}
         style={{ height: "80%", width: "100%" }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {userLocation && <ChangeView center={userLocation} />}
-        {protestLocations.map((protest) => (
+        {protests.map((protest) => (
           <Marker
             key={protest.id}
             position={[

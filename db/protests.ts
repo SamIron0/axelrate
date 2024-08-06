@@ -12,6 +12,7 @@ export const addProtest = async (protest: Tables<"protests">) => {
   const { data, error } = await supabase
     .from("protests")
     .insert(protest)
-    .select();
+    .select()
+    .single();
   return data;
 };

@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   try {
     const supabase = createClient(cookies());
     const user = await supabase.auth.getUser();
-    const protest: Tables<"protests"> = {
+    const newProtest: Tables<"protests"> = {
       id: uuidv4(),
       video_url,
       latitude,
@@ -17,8 +17,8 @@ export async function POST(request: Request) {
       title: "Protest",
       user_id: user.data.user?.id || "",
     };
-    const data = await addProtest(protest);
-    return new Response(JSON.stringify(data), {
+    const protest = await addProtest(newProtest);
+    return new Response(JSON.stringify(protest), {
       status: 200,
     });
   } catch (error) {
