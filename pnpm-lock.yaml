@@ -76,6 +76,9 @@ devDependencies:
   '@types/formidable':
     specifier: ^3.4.5
     version: 3.4.5
+  '@types/geojson':
+    specifier: ^7946.0.14
+    version: 7946.0.14
   '@types/leaflet':
     specifier: ^1.9.12
     version: 1.9.12

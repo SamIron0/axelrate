@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { upload } from "@/lib/cloudinary/cloudinary";
 import L from "leaflet";
-import Filter from "./Filter";
 
 export default function Map({
   protestLocations,
@@ -19,6 +18,7 @@ export default function Map({
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
     null
   );
+  const [isLocationDetermined, setIsLocationDetermined] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCaptureClick = () => {
@@ -33,23 +33,29 @@ export default function Map({
       maximumAge: 0,
     };
 
-    if (fileInputRef.current) {
-      if (
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        )
-      ) {
-        // For mobile devices
-        //toast.info("Please use your camera to capture the protest video");
-      } else {
-        // For desktop
-        //toast.info("Please select a video file from your device");
-      }
-      fileInputRef.current.click();
+    if (!isLocationDetermined) {
+      toast.info("Determining your location. Please wait...");
     }
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setUserLocation([position.coords.latitude, position.coords.longitude]);
+        setIsLocationDetermined(true);
+        if (fileInputRef.current) {
+          if (
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+              navigator.userAgent
+            )
+          ) {
+            fileInputRef.current.click();
+            // For mobile devices
+            //toast.info("Please use your camera to capture the protest video");
+          } else {
+            fileInputRef.current.click();
+            // For desktop
+            //toast.info("Please select a video file from your device");
+          }
+        }
       },
       (error) => {
         switch (error.code) {
@@ -68,6 +74,7 @@ export default function Map({
             toast.error("An unknown error occurred while getting location.");
             break;
         }
+        setIsLocationDetermined(false);
       },
       options
     );
@@ -142,7 +149,7 @@ export default function Map({
             onClick={handleCaptureClick}
             className="bg-accent hover:bg-accent/80 focus:outline-none focus:ring-0 text-white p-2 rounded-md text-sm "
           >
-            Capture Protest
+            {isLocationDetermined ? "Capture Protest" : "Capture Protest"}
           </button>
         </span>
         <input
@@ -157,6 +164,9 @@ export default function Map({
       <MapContainer
         center={[9.082, 8.6753]}
         zoom={6}
+        minZoom={6}
+        maxBounds={bounds}
+        maxBoundsViscosity={1.0}
         style={{
           height: "90%",
           width: "100%",
