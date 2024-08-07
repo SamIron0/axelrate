@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <div className="flex justify-end gap-4 items-center p-4">
-      <Link href="https://github.com/SamIron0/axelrate">
+      <Link href="https://github.com/SamIron0/axelrate" target="_blank" rel="noopener noreferrer">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"

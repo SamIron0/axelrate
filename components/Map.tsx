@@ -170,7 +170,7 @@ export default function Map({
         style={{
           height: "90%",
           width: "100%",
-          border: "2px solid #a1a1aa",
+          border: "2px solid #3f3f46",
           borderRadius: "10px",
         }}
       >
